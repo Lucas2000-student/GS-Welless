@@ -3,6 +3,8 @@ package br.com.fiap.Wellsess.controller;
 import br.com.fiap.Wellsess.dto.SetorRequestDTO;
 import br.com.fiap.Wellsess.dto.SetorResponseDTO;
 import br.com.fiap.Wellsess.service.SetorService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/setores")
+@Tag(name = "Setores", description = "Gerenciamento de setores da empresa")
 public class SetorController {
 
     @Autowired
@@ -28,13 +31,13 @@ public class SetorController {
     }
 
     @PostMapping
-    public ResponseEntity<SetorResponseDTO> create(@RequestBody SetorRequestDTO dto) {
+    public ResponseEntity<SetorResponseDTO> create(@Valid @RequestBody SetorRequestDTO dto) {
         SetorResponseDTO setor = setorService.create(dto);
         return ResponseEntity.ok(setor);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SetorResponseDTO> update(@PathVariable Long id, @RequestBody SetorRequestDTO dto) {
+    public ResponseEntity<SetorResponseDTO> update(@PathVariable Long id, @Valid @RequestBody SetorRequestDTO dto) {
         SetorResponseDTO setor = setorService.update(id, dto);
         return ResponseEntity.ok(setor);
     }

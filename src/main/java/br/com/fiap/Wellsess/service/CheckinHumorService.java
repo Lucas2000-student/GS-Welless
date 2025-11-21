@@ -44,20 +44,17 @@ public class CheckinHumorService {
     }
 
     public CheckinHumorResponseDTO create(CheckinHumorRequestDTO dto) {
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        if (!usuarioRepository.existsById(dto.getUsuarioId())) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
 
         Long proximoId = buscarProximoIdCheckin();
+        java.sql.Date dataCheckinSql = java.sql.Date.valueOf(dto.getDataCheckin());
+        checkinHumorRepository.inserirCheckinHumor(proximoId, dataCheckinSql, dto.getNivelHumor(), dto.getComentario(), dto.getUsuarioId());
+        CheckinHumor checkin = checkinHumorRepository.findById(proximoId)
+                .orElseThrow(() -> new RuntimeException("Erro ao criar checkin"));
 
-        CheckinHumor checkin = new CheckinHumor();
-        checkin.setId(proximoId);
-        checkin.setDataCheckin(dto.getDataCheckin());
-        checkin.setNivelHumor(dto.getNivelHumor());
-        checkin.setComentario(dto.getComentario());
-        checkin.setUsuario(usuario);
-
-        CheckinHumor saved = checkinHumorRepository.save(checkin);
-        return toResponseDTO(saved);
+        return toResponseDTO(checkin);
     }
 
     public CheckinHumorResponseDTO update(Long id, CheckinHumorRequestDTO dto) {

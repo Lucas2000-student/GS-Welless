@@ -3,6 +3,7 @@ package br.com.fiap.Wellsess.controller;
 import br.com.fiap.Wellsess.dto.GestaoRequestDTO;
 import br.com.fiap.Wellsess.dto.GestaoResponseDTO;
 import br.com.fiap.Wellsess.service.GestaoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class GestaoController {
     }
 
     @PostMapping
-    public ResponseEntity<GestaoResponseDTO> create(@RequestBody GestaoRequestDTO dto) {
+    public ResponseEntity<GestaoResponseDTO> create(@Valid @RequestBody GestaoRequestDTO dto) {
         GestaoResponseDTO gestor = gestaoService.create(dto);
         return ResponseEntity.ok(gestor);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GestaoResponseDTO> update(@PathVariable Long id, @RequestBody GestaoRequestDTO dto) {
+    public ResponseEntity<GestaoResponseDTO> update(@Valid @PathVariable Long id, @RequestBody GestaoRequestDTO dto) {
         GestaoResponseDTO gestor = gestaoService.update(id, dto);
         return ResponseEntity.ok(gestor);
     }

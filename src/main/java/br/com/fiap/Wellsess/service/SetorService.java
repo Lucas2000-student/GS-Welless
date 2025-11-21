@@ -43,23 +43,22 @@ public class SetorService {
     }
 
     public SetorResponseDTO create(SetorRequestDTO dto) {
-        Gestao gestor = gestaoRepository.findById(dto.getGestorId())
-                .orElseThrow(() -> new RuntimeException("Gestor não encontrado"));
+        if (!gestaoRepository.existsById(dto.getGestorId())) {
+            throw new RuntimeException("Gestor não encontrado");
+        }
 
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        if (!usuarioRepository.existsById(dto.getUsuarioId())) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
 
         Long proximoId = buscarProximoIdSetor();
 
-        Setor setor = new Setor();
-        setor.setId(proximoId);
-        setor.setNome(dto.getNome());
-        setor.setQuantidadeFuncionarios(dto.getQuantidadeFuncionarios());
-        setor.setGestor(gestor);
-        setor.setUsuario(usuario);
+        setorRepository.inserirSetor(proximoId, dto.getNome(), dto.getQuantidadeFuncionarios(), dto.getGestorId(), dto.getUsuarioId());
 
-        Setor saved = setorRepository.save(setor);
-        return toResponseDTO(saved);
+        Setor setor = setorRepository.findById(proximoId)
+                .orElseThrow(() -> new RuntimeException("Erro ao criar setor"));
+
+        return toResponseDTO(setor);
     }
 
     public SetorResponseDTO update(Long id, SetorRequestDTO dto) {

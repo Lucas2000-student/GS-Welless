@@ -42,20 +42,18 @@ public class GestaoService {
             throw new RuntimeException("Email já cadastrado");
         }
 
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        if (!usuarioRepository.existsById(dto.getUsuarioId())) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
 
         Long proximoId = buscarProximoIdGestao();
 
-        Gestao gestao = new Gestao();
-        gestao.setId(proximoId);
-        gestao.setNome(dto.getNome());
-        gestao.setEmail(dto.getEmail());
-        gestao.setSenha(dto.getSenha());
-        gestao.setUsuario(usuario);
+        gestaoRepository.inserirGestor(proximoId, dto.getNome(), dto.getEmail(), dto.getSenha(), dto.getUsuarioId());
 
-        Gestao saved = gestaoRepository.save(gestao);
-        return toResponseDTO(saved);
+        Gestao gestao = gestaoRepository.findById(proximoId)
+                .orElseThrow(() -> new RuntimeException("Erro ao criar gestor"));
+
+        return toResponseDTO(gestao);
     }
 
     public GestaoResponseDTO update(Long id, GestaoRequestDTO dto) {
