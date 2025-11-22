@@ -6,7 +6,6 @@ plugins {
 
 group = 'br.com.fiap'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
 
 java {
 	toolchain {
@@ -31,4 +30,12 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+bootJar {
+	launchScript()
+}
+
+jar {
+	enabled = false
 }
