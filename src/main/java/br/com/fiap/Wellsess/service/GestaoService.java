@@ -2,6 +2,8 @@ package br.com.fiap.Wellsess.service;
 
 import br.com.fiap.Wellsess.dto.GestaoRequestDTO;
 import br.com.fiap.Wellsess.dto.GestaoResponseDTO;
+import br.com.fiap.Wellsess.dto.LoginRequestDTO;
+import br.com.fiap.Wellsess.dto.LoginResponseDTO;
 import br.com.fiap.Wellsess.entity.Gestao;
 import br.com.fiap.Wellsess.entity.Usuario;
 import br.com.fiap.Wellsess.repository.GestaoRepository;
@@ -10,6 +12,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +27,32 @@ public class GestaoService {
 
     @Autowired
     private EntityManager entityManager;
+
+    public LoginResponseDTO login(LoginRequestDTO loginRequest) {
+        try {
+            // Busca gestor por email
+            Gestao gestao = gestaoRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Gestor não encontrado"));
+
+            // Verifica se a senha corresponde
+            if (gestao.getSenha().equals(loginRequest.getSenha())) {
+                // Login bem-sucedido - cria um DTO simples com dados do gestor
+                GestaoResponseDTO gestorDTO = toResponseDTO(gestao);
+                return new LoginResponseDTO(true, "Login realizado com sucesso", gestorDTO);
+            } else {
+                // Senha incorreta
+                return new LoginResponseDTO(false, "Senha incorreta");
+            }
+        } catch (RuntimeException e) {
+            // Gestor não encontrado ou outros erros
+            return new LoginResponseDTO(false, "Credenciais inválidas");
+        }
+    }
+
+    public LoginResponseDTO login(String email, String senha) {
+        LoginRequestDTO loginRequest = new LoginRequestDTO(email, senha);
+        return login(loginRequest);
+    }
 
     public List<GestaoResponseDTO> findAll() {
         return gestaoRepository.findAll().stream()

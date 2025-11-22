@@ -1,5 +1,7 @@
 package br.com.fiap.Wellsess.service;
 
+import br.com.fiap.Wellsess.dto.LoginRequestDTO;
+import br.com.fiap.Wellsess.dto.LoginResponseDTO;
 import br.com.fiap.Wellsess.dto.UsuarioRequestDTO;
 import br.com.fiap.Wellsess.dto.UsuarioResponseDTO;
 import br.com.fiap.Wellsess.entity.Usuario;
@@ -22,6 +24,27 @@ public class UsuarioService {
 
     @Autowired
     private EntityManager entityManager;
+
+    public LoginResponseDTO login(LoginRequestDTO loginRequest) {
+        try {
+            Usuario usuario = usuarioRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+            if (usuario.getSenha().equals(loginRequest.getSenha())) {
+
+                return new LoginResponseDTO(true, "Login realizado com sucesso", toResponseDTO(usuario));
+            } else {
+                return new LoginResponseDTO(false, "Senha incorreta");
+            }
+        } catch (RuntimeException e) {
+            return new LoginResponseDTO(false, "Credenciais inválidas");
+        }
+    }
+
+    public LoginResponseDTO login(String email, String senha) {
+        LoginRequestDTO loginRequest = new LoginRequestDTO(email, senha);
+        return login(loginRequest);
+    }
 
     public List<UsuarioResponseDTO> findAll() {
         return usuarioRepository.findAll().stream()

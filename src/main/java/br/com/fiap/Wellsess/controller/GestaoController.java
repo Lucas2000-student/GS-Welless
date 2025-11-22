@@ -2,6 +2,8 @@ package br.com.fiap.Wellsess.controller;
 
 import br.com.fiap.Wellsess.dto.GestaoRequestDTO;
 import br.com.fiap.Wellsess.dto.GestaoResponseDTO;
+import br.com.fiap.Wellsess.dto.LoginRequestDTO;
+import br.com.fiap.Wellsess.dto.LoginResponseDTO;
 import br.com.fiap.Wellsess.service.GestaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +20,18 @@ public class GestaoController {
 
     @Autowired
     private GestaoService gestaoService;
+
+    @PostMapping("/login")
+    @Operation(summary = "Realizar login do gestor", description = "Autentica gestor com email e senha")
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
+        LoginResponseDTO response = gestaoService.login(loginRequest);
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(401).body(response);
+        }
+    }
 
     @GetMapping
     @Operation(summary = "Listar todos os gestores", description = "Retorna todos os gestores cadastrados")

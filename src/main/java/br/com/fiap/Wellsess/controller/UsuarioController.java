@@ -1,5 +1,7 @@
 package br.com.fiap.Wellsess.controller;
 
+import br.com.fiap.Wellsess.dto.LoginRequestDTO;
+import br.com.fiap.Wellsess.dto.LoginResponseDTO;
 import br.com.fiap.Wellsess.dto.UsuarioRequestDTO;
 import br.com.fiap.Wellsess.dto.UsuarioResponseDTO;
 import br.com.fiap.Wellsess.service.UsuarioService;
@@ -22,6 +24,18 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @PostMapping("/login")
+    @Operation(summary = "Realizar login", description = "Autentica usuário com email e senha")
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
+        LoginResponseDTO response = usuarioService.login(loginRequest);
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(401).body(response);
+        }
+    }
 
     @GetMapping("/all")
     @Operation(summary = "Listar todos os usuários", description = "Retorna todos os usuários sem paginação")

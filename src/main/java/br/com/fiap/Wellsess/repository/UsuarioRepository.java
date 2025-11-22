@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
@@ -17,6 +18,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Page<Usuario> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 
     Page<Usuario> findByEmailContainingIgnoreCase(String email, Pageable pageable);
+
+    @Query("SELECT u FROM Usuario u WHERE u.email = :email")
+    Optional<Usuario> findByEmail(@Param("email") String email);
 
     @Modifying
     @Transactional
