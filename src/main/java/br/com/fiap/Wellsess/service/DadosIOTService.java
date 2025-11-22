@@ -44,19 +44,32 @@ public class DadosIOTService {
     }
 
     public DadosIOTResponseDTO create(DadosIOTRequestDTO dto) {
-        if (!checkinHumorRepository.existsById(dto.getCheckinId())) {
-            throw new RuntimeException("Checkin não encontrado");
+        System.out.println("📥 Recebendo DTO: " + dto);
+
+        try {
+            if (!checkinHumorRepository.existsById(dto.getCheckinId())) {
+                System.out.println("❌ Checkin não encontrado: " + dto.getCheckinId());
+                throw new RuntimeException("Checkin não encontrado");
+            }
+
+            Long proximoId = buscarProximoIdDadosIOT();
+            java.sql.Date dataColetaSql = java.sql.Date.valueOf(dto.getDataColeta());
+
+            System.out.println("💾 Inserindo dados: ID=" + proximoId + ", Temp=" + dto.getTemperatura());
+
+            dadosIOTRepository.inserirDadosIOT(proximoId, dataColetaSql, dto.getTemperatura(), dto.getLocalSensor(), dto.getCheckinId());
+
+            DadosIOT dados = dadosIOTRepository.findById(proximoId)
+                    .orElseThrow(() -> new RuntimeException("Erro ao criar dados IOT"));
+
+            System.out.println("✅ Dados criados com sucesso: " + dados.getId());
+            return toResponseDTO(dados);
+
+        } catch (Exception e) {
+            System.out.println("❌ Erro no create: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-
-        Long proximoId = buscarProximoIdDadosIOT();
-        java.sql.Date dataColetaSql = java.sql.Date.valueOf(dto.getDataColeta());
-
-        dadosIOTRepository.inserirDadosIOT(proximoId, dataColetaSql, dto.getTemperatura(), dto.getLocalSensor(), dto.getCheckinId());
-
-        DadosIOT dados = dadosIOTRepository.findById(proximoId)
-                .orElseThrow(() -> new RuntimeException("Erro ao criar dados IOT"));
-
-        return toResponseDTO(dados);
     }
 
     public DadosIOTResponseDTO update(Long id, DadosIOTRequestDTO dto) {
